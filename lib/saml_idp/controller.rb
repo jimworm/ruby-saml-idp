@@ -5,6 +5,7 @@ module SamlIdp
     require 'base64'
     require 'time'
     require 'uuid'
+    require 'nokogiri'
 
     attr_accessor :x509_certificate, :secret_key, :algorithm
     attr_accessor :saml_acs_url
