@@ -51,11 +51,12 @@ module SamlIdp
 
       def decode_SAMLRequest(saml_request)
         zstream  = Zlib::Inflate.new(-Zlib::MAX_WBITS)
-        @saml_request = zstream.inflate(Base64.decode64(saml_request))
+        @saml_request = Nokogiri::XML(zstream.inflate(Base64.decode64(saml_request)))
+        @saml_request.remove_namespaces!
         zstream.finish
         zstream.close
-        @saml_request_id = @saml_request[/ID=['"](.+?)['"]/, 1]
-        @saml_acs_url = @saml_request[/AssertionConsumerServiceURL=['"](.+?)['"]/, 1]
+        @saml_acs_url = @saml_request.css('AuthnRequest').attribute('AssertionConsumerServiceURL').value
+        @saml_request_id = @saml_request.css('Issuer').text
       end
 
       def encode_SAMLResponse(nameID, opts = {})
