@@ -4,7 +4,6 @@ module SamlIdp
     include SamlIdp::Controller
 
     unloadable
-
     protect_from_forgery
 
     before_filter :validate_saml_request
@@ -14,28 +13,25 @@ module SamlIdp
     end
 
     def create
-      unless params[:email].blank? && params[:password].blank?
-        person = idp_authenticate(params[:email], params[:password])
-        if person.nil?
-          @saml_idp_fail_msg = "Incorrect email or password."
-        else
-          @saml_response = idp_make_saml_response(person)
-          render :template => "saml_idp/idp/saml_post", :layout => false
-          return
-        end
-      end
-      render :template => "saml_idp/idp/new"
+      render('saml_idp/idp/saml_post', layout: false) and return if @saml_response = encode_SAMLResponse(current_user.email, decoded_saml_request)
+      render 'saml_idp/idp/new'
     end
 
     protected
-
-      def idp_authenticate(email, password)
-        raise "Not implemented"
-      end
-
-      def idp_make_saml_response(person)
-        raise "Not implemented"
-      end
-
+    def saml_request
+      params[:SAMLRequest] || session[:saml]
+    end
+    helper_method :saml_request
+  
+    def decoded_saml_request(saml_request)
+      @decoded_saml_request ||= decode_SAMLRequest(saml_request)
+    end
+    helper_method :decoded_saml_request
+  
+    def validate_saml_request
+      decoded_saml_request(saml_request)
+    rescue
+      render 'saml_idp/idp/error' and return
+    end
   end
 end
