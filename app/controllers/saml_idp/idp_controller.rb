@@ -32,6 +32,10 @@ module SamlIdp
   
     def decoded_saml_request
       @decoded_saml_request ||= decode_SAMLRequest(saml_request)
+    rescue => e
+      logger.warn "SAML request failed to decode: #{e.message}"
+      logger.warn "Original SAML request: '#{saml_request}`"
+      raise e
     end
     helper_method :decoded_saml_request
   
