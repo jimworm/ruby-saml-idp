@@ -1,5 +1,5 @@
 <%= form_tag do %>
   <%= hidden_field_tag("SAMLRequest", saml_request) %>
-  <p>Click button to log in to <%= saml_request[:issuer] -%></p>
-  <%= submit_tag "Sign in" %>
+  <p>Click button to log in to <%= decoded_saml_request[:issuer] -%></p>
+  <p><%= submit_tag "Sign in" %></p>
 <% end %>
