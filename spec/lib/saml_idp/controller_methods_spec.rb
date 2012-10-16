@@ -1,10 +1,10 @@
 # encoding: utf-8
 require 'spec_helper'
 
-describe "SamlIdp::Controller" do
+describe "SamlIdp::ControllerMethods" do
   let(:controller) do
     Class.new do
-      include SamlIdp::Controller
+      include SamlIdp::ControllerMethods
     end.new
   end
   let(:acs_url) { 'https://example.com/saml/consume' }

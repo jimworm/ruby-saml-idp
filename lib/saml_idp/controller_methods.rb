@@ -1,23 +1,8 @@
 # encoding: utf-8
 module SamlIdp
-  module Controller
-
+  module ControllerMethods
     attr_accessor :x509_certificate, :secret_key, :algorithm
-    attr_accessor :saml_acs_url
-
-    def x509_certificate
-      @x509_certificate || SamlIdp.config.x509_certificate
-    end
-
-    def secret_key
-      @secret_key || SamlIdp.config.secret_key
-    end
-
-    def algorithm
-      self.algorithm = SamlIdp.config.algorithm unless @algorithm
-      @algorithm
-    end
-
+    
     def algorithm=(new_algorithm)
       @algorithm = case new_algorithm
         when :sha256 then OpenSSL::Digest::SHA256
@@ -26,12 +11,8 @@ module SamlIdp
         when :sha1   then OpenSSL::Digest::SHA1
         else; fail 'Unknown algorithm'
       end
-    end
-
-    def algorithm_name
-      algorithm.to_s.split('::').last.downcase
-    end
-  
+    endg
+    
     protected
     def decode_SAMLRequest(saml_request)
       zstream  = Zlib::Inflate.new(-Zlib::MAX_WBITS)
@@ -63,6 +44,23 @@ module SamlIdp
       xml = %[<samlp:Response ID="_#{response_id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{decoded_saml_request[:acs_url]}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="#{decoded_saml_request[:issuer]}" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"><Issuer xmlns="urn:oasis:names:tc:SAML:2.0:assertion">#{issuer_uri}</Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" /></samlp:Status>#{assertion_and_signature}</samlp:Response>]
 
       Base64.encode64(xml)
+    end
+    
+    def x509_certificate
+      @x509_certificate || SamlIdp.config.x509_certificate
+    end
+
+    def secret_key
+      @secret_key || SamlIdp.config.secret_key
+    end
+
+    def algorithm
+      self.algorithm = SamlIdp.config.algorithm unless @algorithm
+      @algorithm
+    end
+
+    def algorithm_name
+      algorithm.to_s.split('::').last.downcase
     end
     
     private
