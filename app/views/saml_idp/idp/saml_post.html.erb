@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 </head>
-<body onload="document.forms[0].submit();" style="visibility:hidden;">
+<body onload="document.forms[0].submit();document.forms[0].style.visibility = 'hidden';">
 <%= form_tag(decoded_saml_request[:acs_url]) do %>
   <%= hidden_field_tag("SAMLResponse", @saml_response) %>
   <%= submit_tag "Submit" %>
