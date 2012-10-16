@@ -1,5 +1,10 @@
 # encoding: utf-8
 module SamlIdp
+  require 'openssl'
+  require 'base64'
+  require 'time'
+  require 'uuid'
+  require 'nokogiri'
   require 'saml_idp/configurator'
   require 'saml_idp/controller'
   require 'saml_idp/default'

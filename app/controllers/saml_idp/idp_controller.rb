@@ -13,23 +13,30 @@ module SamlIdp
     end
 
     def create
-      render('saml_idp/idp/saml_post', layout: false) and return if @saml_response = encode_SAMLResponse(current_user.email, decoded_saml_request)
-      render 'saml_idp/idp/new'
+      if @saml_response = encode_SAMLResponse(id_resource, decoded_saml_request)
+        render('saml_idp/idp/saml_post', layout: false)
+      else
+        render 'saml_idp/idp/new'
+      end
     end
 
     protected
+    def id_resource
+      fail NotImplementedError
+    end
+    
     def saml_request
-      params[:SAMLRequest] || session[:saml]
+      fail NotImplementedError
     end
     helper_method :saml_request
   
-    def decoded_saml_request(saml_request)
+    def decoded_saml_request
       @decoded_saml_request ||= decode_SAMLRequest(saml_request)
     end
     helper_method :decoded_saml_request
   
     def validate_saml_request
-      decoded_saml_request(saml_request)
+      decoded_saml_request
     rescue
       render 'saml_idp/idp/error' and return
     end
