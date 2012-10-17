@@ -11,7 +11,7 @@ module SamlIdp
         when :sha1   then OpenSSL::Digest::SHA1
         else; fail 'Unknown algorithm'
       end
-    endg
+    end
     
     protected
     def decode_SAMLRequest(saml_request)
