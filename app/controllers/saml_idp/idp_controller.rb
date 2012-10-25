@@ -1,5 +1,5 @@
 # encoding: utf-8
-class SamlIdp::IdpController < ActionController::Base
+class SamlIdp::IdpController < ApplicationController
   include SamlIdp::ControllerMethods
 
   unloadable
