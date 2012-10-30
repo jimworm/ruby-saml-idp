@@ -24,14 +24,22 @@ describe "SamlIdp::ControllerMethods" do
     end
   
     describe "#encode_SAMLRequest" do
-      let(:decoded) { {acs_url: acs_url, issuer: issuer} }
+      let(:decoded)     { {acs_url: acs_url, issuer: issuer} }
+      let(:extra_attrs) { { 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname' => 'Patrick',
+                            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'   => 'Bateman',
+                            'alias'                                                           => 'Batman' } }
       
       context "with default hash alogrithm" do
-        it "returns a valid SAML response" do
-          saml_response = controller.send(:encode_SAMLResponse, "foo@example.com", decoded)
+        it "returns a valid SAML response with extra attributes" do
+          saml_response = controller.send(:encode_SAMLResponse, "foo@example.com", decoded, attributes: extra_attrs)
           response = Onelogin::Saml::Response.new(saml_response)
           response.name_id.should == "foo@example.com"
           response.issuer.should == "http://example.com"
+          
+          response.attributes['alias'].should == 'Batman'
+          response.attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'].should == 'Patrick'
+          response.attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'].should == 'Bateman'
+          
           response.settings = saml_settings
           response.is_valid?.should be_true
         end

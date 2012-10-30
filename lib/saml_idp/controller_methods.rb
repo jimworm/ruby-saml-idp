@@ -28,8 +28,17 @@ module SamlIdp
       response_id, reference_id = UUID.generate, UUID.generate
       audience_uri = opts[:audience_uri] || decoded_saml_request[:acs_url][/^(.*?\/\/.*?\/)/, 1]
       issuer_uri = opts[:issuer_uri] || (defined?(request) && request.url) || "http://example.com"
+      
+      extra_attributes = if opts[:attributes] and opts[:attributes].is_a? Hash
+        opts[:attributes].map do |attr_name, value|
+          "<Attribute Name=\"#{attr_name}\"><AttributeValue>" + value + "</AttributeValue></Attribute>"
+        end.join
+      else
+        ''
+      end
+      
 
-      assertion = %[<Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="_#{reference_id}" IssueInstant="#{now.iso8601}" Version="2.0"><Issuer>#{issuer_uri}</Issuer><Subject><NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">#{nameID}</NameID><SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"><SubjectConfirmationData InResponseTo="#{decoded_saml_request[:issuer]}" NotOnOrAfter="#{(now+3*60).iso8601}" Recipient="#{decoded_saml_request[:acs_url]}"></SubjectConfirmationData></SubjectConfirmation></Subject><Conditions NotBefore="#{(now-5).iso8601}" NotOnOrAfter="#{(now+60*60).iso8601}"><AudienceRestriction><Audience>#{audience_uri}</Audience></AudienceRestriction></Conditions><AttributeStatement><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"><AttributeValue>#{nameID}</AttributeValue></Attribute></AttributeStatement><AuthnStatement AuthnInstant="#{now.iso8601}" SessionIndex="_#{reference_id}"><AuthnContext><AuthnContextClassRef>urn:federation:authentication:windows</AuthnContextClassRef></AuthnContext></AuthnStatement></Assertion>]
+      assertion = %[<Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="_#{reference_id}" IssueInstant="#{now.iso8601}" Version="2.0"><Issuer>#{issuer_uri}</Issuer><Subject><NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">#{nameID}</NameID><SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"><SubjectConfirmationData InResponseTo="#{decoded_saml_request[:issuer]}" NotOnOrAfter="#{(now+3*60).iso8601}" Recipient="#{decoded_saml_request[:acs_url]}"></SubjectConfirmationData></SubjectConfirmation></Subject><Conditions NotBefore="#{(now-5).iso8601}" NotOnOrAfter="#{(now+60*60).iso8601}"><AudienceRestriction><Audience>#{audience_uri}</Audience></AudienceRestriction></Conditions><AttributeStatement><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"><AttributeValue>#{nameID}</AttributeValue></Attribute>#{extra_attributes}</AttributeStatement><AuthnStatement AuthnInstant="#{now.iso8601}" SessionIndex="_#{reference_id}"><AuthnContext><AuthnContextClassRef>urn:federation:authentication:windows</AuthnContextClassRef></AuthnContext></AuthnStatement></Assertion>]
 
       digest_value = Base64.encode64(algorithm.digest(assertion)).gsub(/\n/, '')
 
