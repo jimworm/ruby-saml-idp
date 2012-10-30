@@ -2,6 +2,7 @@
 module SamlIdp
   require 'openssl'
   require 'base64'
+  require 'cgi'
   require 'time'
   require 'uuid'
   require 'nokogiri'

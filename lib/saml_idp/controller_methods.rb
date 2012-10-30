@@ -31,7 +31,7 @@ module SamlIdp
       
       extra_attributes = if opts[:attributes] and opts[:attributes].is_a? Hash
         opts[:attributes].map do |attr_name, value|
-          "<Attribute Name=\"#{attr_name}\"><AttributeValue>" + value + "</AttributeValue></Attribute>"
+          "<Attribute Name=\"#{CGI.escapeHTML(attr_name)}\"><AttributeValue>#{CGI.escapeHTML(value)}</AttributeValue></Attribute>"
         end.join
       else
         ''

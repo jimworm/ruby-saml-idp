@@ -27,21 +27,32 @@ describe "SamlIdp::ControllerMethods" do
       let(:decoded)     { {acs_url: acs_url, issuer: issuer} }
       let(:extra_attrs) { { 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname' => 'Patrick',
                             'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'   => 'Bateman',
-                            'alias'                                                           => 'Batman' } }
+                            'alias'                                                           => 'I <3 Batman & Robin' } }
       
       context "with default hash alogrithm" do
-        it "returns a valid SAML response with extra attributes" do
+        it "returns a valid SAML assertion" do
+          saml_response = controller.send(:encode_SAMLResponse, "foo@example.com", decoded)
+          response = Onelogin::Saml::Response.new(saml_response)
+          response.settings = saml_settings
+          response.is_valid?.should be_true
+          
+          response.name_id.should == "foo@example.com"
+          response.issuer.should == "http://example.com"
+        end
+        
+        it "returns a SAML assertion with extra attributes" do
           saml_response = controller.send(:encode_SAMLResponse, "foo@example.com", decoded, attributes: extra_attrs)
           response = Onelogin::Saml::Response.new(saml_response)
+          response.settings = saml_settings
+          response.is_valid?.should be_true
+          
           response.name_id.should == "foo@example.com"
           response.issuer.should == "http://example.com"
           
-          response.attributes['alias'].should == 'Batman'
+          response.attributes['alias'].should == 'I <3 Batman & Robin'
           response.attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'].should == 'Patrick'
           response.attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'].should == 'Bateman'
           
-          response.settings = saml_settings
-          response.is_valid?.should be_true
         end
       end
       
