@@ -6,7 +6,7 @@ module SamlRequestMacros
   end
 
   def saml_settings(options = {})
-    defaults = {issuer: "http://example.com/issuer",
+    defaults = {issuer: "example.com",
                 acs_url: "https://foo.example.com/saml/consume",
                 target: "http://idp.com/saml/idp"}
     options = defaults.merge(options)
