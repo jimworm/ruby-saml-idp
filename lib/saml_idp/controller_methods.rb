@@ -49,7 +49,7 @@ module SamlIdp
             end
             if opts[:attributes] and opts[:attributes].is_a? Hash
               opts[:attributes].each do |name, value|
-                Attribute('Name' => name) { AttributeValue value }
+                Attribute('Name' => name) { AttributeValue value.to_s }
               end
             end
           end

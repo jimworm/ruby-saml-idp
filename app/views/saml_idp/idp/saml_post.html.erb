@@ -6,6 +6,7 @@
 </head>
 <body onload="document.forms[0].submit();document.forms[0].style.visibility = 'hidden';">
 <%= form_tag(decoded_saml_request[:acs_url]) do %>
+  <p>Click submit to continue</p>
   <%= hidden_field_tag("SAMLResponse", @saml_response) %>
   <%= submit_tag "Submit" %>
 <% end %>
