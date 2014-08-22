@@ -1,6 +1,6 @@
 module SamlRequestMacros
   def make_saml_request(options = {})
-    auth_request = Onelogin::Saml::Authrequest.new
+    auth_request = OneLogin::RubySaml::Saml::Authrequest.new
     auth_url = auth_request.create(saml_settings(options))
     CGI.unescape(auth_url.split("=").last)
   end
@@ -10,7 +10,7 @@ module SamlRequestMacros
                 acs_url: "https://foo.example.com/saml/consume",
                 target: "http://idp.com/saml/idp"}
     options = defaults.merge(options)
-    settings = Onelogin::Saml::Settings.new
+    settings = OneLogin::RubySaml::Saml::Settings.new
     settings.assertion_consumer_service_url = options[:acs_url]
     settings.issuer = options[:issuer]
     settings.idp_sso_target_url = options[:target]

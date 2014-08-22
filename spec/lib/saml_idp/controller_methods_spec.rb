@@ -33,7 +33,7 @@ describe "SamlIdp::ControllerMethods" do
         it "returns a valid SAML assertion" do
           saml_response = controller.send(:encode_SAMLResponse, "foo@example.com", decoded)
           # XMLSecurity::SignedDocument.any_instance.stub(:validate_doc).and_raise('fuck')
-          response = Onelogin::Saml::Response.new(saml_response)
+          response = OneLogin::RubySaml::Saml::Response.new(saml_response)
           response.settings = saml_settings
           response.send :validate, false
           response.is_valid?.should be_true
@@ -44,7 +44,7 @@ describe "SamlIdp::ControllerMethods" do
         
         it "returns a SAML assertion with extra attributes" do
           saml_response = controller.send(:encode_SAMLResponse, "foo@example.com", decoded, attributes: extra_attrs)
-          response = Onelogin::Saml::Response.new(saml_response)
+          response = OneLogin::RubySaml::Saml::Response.new(saml_response)
           response.settings = saml_settings
           response.send :validate, false
           # response.is_valid?.should be_true
@@ -64,7 +64,7 @@ describe "SamlIdp::ControllerMethods" do
           it "returns a valid SAML response" do
             controller.algorithm = scheme
             saml_response = controller.send(:encode_SAMLResponse, "foo@example.com", decoded)
-            response = Onelogin::Saml::Response.new(saml_response)
+            response = OneLogin::RubySaml::Saml::Response.new(saml_response)
             response.name_id.should == "foo@example.com"
             response.issuer.should == "example.com"
             response.settings = saml_settings

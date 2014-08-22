@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake"
   # s.add_development_dependency "rcov"
   s.add_development_dependency "rspec"
-  s.add_development_dependency "ruby-saml"
+  s.add_development_dependency "ruby-saml", "~> 0.8"
   s.add_development_dependency("rails", "~> 3.2")
   s.add_development_dependency("capybara")
 end
