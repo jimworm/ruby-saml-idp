@@ -64,16 +64,17 @@ module SamlIdp
       digest_value = Base64.strict_encode64(algorithm.digest(canonicalize(assertion)))
       
       signed_info = Nokogiri::XML::DocumentFragment.parse ''
+      algo = algorithm_name
       Nokogiri::XML::Builder.with(signed_info) do
         SignedInfo('xmlns:ds' => 'http://www.w3.org/2000/09/xmldsig#') do
           CanonicalizationMethod('Algorithm' => 'http://www.w3.org/2001/10/xml-exc-c14n#')
-          SignatureMethod('Algorithm' => "http://www.w3.org/2000/09/xmldsig#rsa-#{algorithm_name}")
+          SignatureMethod('Algorithm' => "http://www.w3.org/2000/09/xmldsig#rsa-#{algo}")
           Reference('URI' => "#_#{reference_id}") do
             Transforms do
               Transform('Algorithm' => 'http://www.w3.org/2000/09/xmldsig#enveloped-signature')
               Transform('Algorithm' => 'http://www.w3.org/2001/10/xml-exc-c14n#')
             end
-            DigestMethod('Algorithm' => "http://www.w3.org/2000/09/xmldsig##{algorithm_name}")
+            DigestMethod('Algorithm' => "http://www.w3.org/2000/09/xmldsig##{algo}")
             DigestValue digest_value
           end
         end
@@ -84,10 +85,11 @@ module SamlIdp
       signature_value = sign(canonicalize(signed_info))
       
       keyinfo = Nokogiri::XML::DocumentFragment.parse ''
+      certificate_text = x509_certificate
       Nokogiri::XML::Builder.with(keyinfo) do
         KeyInfo('xmlns' => 'http://www.w3.org/2000/09/xmldsig#') do
           X509Data do
-            X509Certificate x509_certificate
+            X509Certificate certificate_text
           end
         end
       end
